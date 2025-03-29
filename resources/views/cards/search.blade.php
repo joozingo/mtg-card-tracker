@@ -227,11 +227,11 @@
 
                                 <span
                                     style="text-transform: capitalize;
-                                                                                                                                                                                                                                                                                                color: {{ $card->rarity == 'common' ? '#4a5568' :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                color: {{ $card->rarity == 'common' ? '#4a5568' :
                                 ($card->rarity == 'uncommon' ? '#2d3748' :
                                     ($card->rarity == 'rare' ? '#2c5282' :
                                         ($card->rarity == 'mythic' ? '#c05621' : '#4a5568'))) }};
-                                                                                                                                                                                                                                                                                                font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
                                     {{ $card->rarity }}
                                 </span>
                             </div>
@@ -248,158 +248,6 @@
                 @endforeach
             </div>
 
-            <style>
-                .card-item:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-                }
-
-                .card-item:hover .card-image {
-                    transform: scale(1.05);
-                }
-
-                .card-item:hover .card-actions {
-                    transform: translateY(0);
-                }
-
-                /* Make action buttons visible on mobile without hover */
-                @media (max-width: 768px) {
-                    .card-actions {
-                        transform: translateY(0);
-                    }
-                }
-
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-
-                .dropdown-content button:hover {
-                    background-color: #f1f5f9;
-                }
-
-                /* Color filter styles */
-                .color-filter {
-                    display: flex;
-                    align-items: center;
-                }
-
-                .color-option {
-                    position: relative;
-                    margin-right: 4px;
-                }
-
-                .color-label {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    border: 2px solid transparent;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                }
-
-                .color-icon {
-                    font-weight: bold;
-                    font-size: 1.25rem;
-                }
-
-                .color-option input[type="checkbox"]:checked+.color-label {
-                    transform: scale(1.1);
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-                    position: relative;
-                }
-
-                /* Add checkmark indicator for selected colors */
-                .color-option input[type="checkbox"]:checked+.color-label::after {
-                    content: '✓';
-                    position: absolute;
-                    top: -5px;
-                    right: -5px;
-                    width: 20px;
-                    height: 20px;
-                    background-color: #38a169;
-                    color: white;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-size: 12px;
-                    font-weight: bold;
-                    border: 2px solid white;
-                }
-
-                .color-option input[type="checkbox"]:checked+.white-mana {
-                    border: 3px solid #744210;
-                    background: radial-gradient(circle, #fefcbf, #ecc94b);
-                    animation: pulse 1.5s infinite;
-                }
-
-                .color-option input[type="checkbox"]:checked+.blue-mana {
-                    border: 3px solid #2c5282;
-                    background: radial-gradient(circle, #bee3f8, #3182ce);
-                    animation: pulse 1.5s infinite;
-                }
-
-                .color-option input[type="checkbox"]:checked+.black-mana {
-                    border: 3px solid #fff;
-                    background: radial-gradient(circle, #2d3748, #000);
-                    animation: pulse 1.5s infinite;
-                }
-
-                .color-option input[type="checkbox"]:checked+.red-mana {
-                    border: 3px solid #c53030;
-                    background: radial-gradient(circle, #fed7d7, #e53e3e);
-                    animation: pulse 1.5s infinite;
-                }
-
-                .color-option input[type="checkbox"]:checked+.green-mana {
-                    border: 3px solid #276749;
-                    background: radial-gradient(circle, #c6f6d5, #38a169);
-                    animation: pulse 1.5s infinite;
-                }
-
-                .color-option input[type="checkbox"]:checked+.colorless-mana {
-                    border: 3px solid #4a5568;
-                    background: radial-gradient(circle, #edf2f7, #a0aec0);
-                    animation: pulse 1.5s infinite;
-                }
-
-                @keyframes pulse {
-                    0% {
-                        box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.4);
-                    }
-
-                    70% {
-                        box-shadow: 0 0 0 6px rgba(66, 153, 225, 0);
-                    }
-
-                    100% {
-                        box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
-                    }
-                }
-
-                #clear-colors:hover {
-                    background-color: #4a5568;
-                }
-
-                @media (max-width: 768px) {
-                    .color-filter-options {
-                        margin-left: 0 !important;
-                        margin-top: 0.5rem;
-                        flex-direction: column;
-                        align-items: flex-start !important;
-                    }
-
-                    .color-filter-options select {
-                        width: 100%;
-                        margin-bottom: 0.5rem;
-                    }
-                }
-            </style>
-
             <div class="pagination">
                 {{ $cards->links() }}
             </div>
@@ -411,17 +259,337 @@
         @endif
     @endif
 
+    <style>
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-item:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        .card-item:hover .card-actions {
+            transform: translateY(0);
+        }
+
+        /* Make action buttons visible on mobile without hover */
+        @media (max-width: 768px) {
+            .card-actions {
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* Color filter styles */
+        .color-filter {
+            /* Styles moved to inline, keep for potential future use */
+            /* display: flex; */
+            /* align-items: center; */
+        }
+
+        .color-option {
+            position: relative;
+            /* Adjusted margin-right in the flex container gap */
+            /* margin-right: 4px; */
+        }
+
+        /* NEW: Base styles for color labels */
+        .color-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            /* Use specific border properties */
+            border-width: 2px;
+            border-style: solid;
+            border-color: transparent;
+            /* Default border color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* Needed for the checkmark */
+        }
+
+        .color-icon {
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        /* NEW: Color-specific styles - only set background and border-color initially (removed !important) */
+        .white-mana {
+            /* Style applied inline now for testing */
+            /* background: radial-gradient(circle, #fffbea, #f6e05e); */
+            /* border-color: #ecc94b; */
+        }
+
+        .white-mana .color-icon {
+            color: #744210;
+        }
+
+        .blue-mana {
+            background: radial-gradient(circle, #ebf8ff, #63b3ed);
+            border-color: #4299e1;
+        }
+
+        .blue-mana .color-icon {
+            color: #2c5282;
+        }
+
+        .black-mana {
+            background: radial-gradient(circle, #4a5568, #1a202c);
+            border-color: #2d3748;
+        }
+
+        .black-mana .color-icon {
+            color: #e2e8f0;
+        }
+
+        .red-mana {
+            background: radial-gradient(circle, #fff5f5, #fc8181);
+            border-color: #f56565;
+        }
+
+        .red-mana .color-icon {
+            color: #c53030;
+        }
+
+        .green-mana {
+            background: radial-gradient(circle, #f0fff4, #9ae6b4);
+            border-color: #68d391;
+        }
+
+        .green-mana .color-icon {
+            color: #276749;
+        }
+
+        .colorless-mana {
+            background: radial-gradient(circle, #f7fafc, #cbd5e0);
+            border-color: #a0aec0;
+        }
+
+        .colorless-mana .color-icon {
+            color: #4a5568;
+        }
+
+
+        /* Styles applied when label has .is-checked class (added by JS) */
+        .color-label.is-checked {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Checkmark indicator */
+        .color-label.is-checked::after {
+            content: '✓';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background-color: #38a169;
+            /* Green checkmark background */
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid white;
+            /* White border around checkmark */
+        }
+
+        /* Specific checked styles triggered by .is-checked class */
+        .white-mana.is-checked {
+            border-color: #744210 !important;
+            /* Darker border when checked - use important to override inline */
+            background: radial-gradient(circle, #fefcbf, #ecc94b) !important;
+            /* Enhanced background - override inline */
+            animation: pulse-white 1.5s infinite;
+        }
+
+        .blue-mana.is-checked {
+            border-color: #2c5282 !important;
+            background: radial-gradient(circle, #bee3f8, #3182ce) !important;
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        .black-mana.is-checked {
+            border-color: #cbd5e0 !important;
+            /* Lighter border for contrast */
+            background: radial-gradient(circle, #2d3748, #000) !important;
+            animation: pulse-black 1.5s infinite;
+        }
+
+        .red-mana.is-checked {
+            border-color: #c53030 !important;
+            background: radial-gradient(circle, #fed7d7, #e53e3e) !important;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        .green-mana.is-checked {
+            border-color: #276749 !important;
+            background: radial-gradient(circle, #c6f6d5, #38a169) !important;
+            animation: pulse-green 1.5s infinite;
+        }
+
+        .colorless-mana.is-checked {
+            border-color: #4a5568 !important;
+            background: radial-gradient(circle, #edf2f7, #a0aec0) !important;
+            animation: pulse-colorless 1.5s infinite;
+        }
+
+        /* Keep pulse animations */
+        @keyframes pulse-white {
+            0% {
+                box-shadow: 0 0 0 0 rgba(236, 201, 75, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(236, 201, 75, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(236, 201, 75, 0);
+            }
+        }
+
+        @keyframes pulse-blue {
+            0% {
+                box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(66, 153, 225, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(66, 153, 225, 0);
+            }
+        }
+
+        @keyframes pulse-black {
+            0% {
+                box-shadow: 0 0 0 0 rgba(203, 213, 224, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(203, 213, 224, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(203, 213, 224, 0);
+            }
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(245, 101, 101, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 101, 101, 0);
+            }
+        }
+
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(72, 187, 120, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+            }
+        }
+
+        @keyframes pulse-colorless {
+            0% {
+                box-shadow: 0 0 0 0 rgba(160, 174, 192, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(160, 174, 192, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(160, 174, 192, 0);
+            }
+        }
+
+        /* Keep clear button hover and responsive styles */
+        #clear-colors:hover {
+            background-color: #4a5568;
+        }
+
+        @media (max-width: 768px) {
+            .color-filter-options {
+                margin-left: 0 !important;
+                margin-top: 0.5rem;
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            .color-filter-options select {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Fix for clear colors button
-            document.getElementById('clear-colors').addEventListener('click', function () {
-                const colorCheckboxes = document.querySelectorAll('input[name="colors[]"]');
-                colorCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
+            const colorCheckboxes = document.querySelectorAll('.color-option input[type="checkbox"]');
+            const clearButton = document.getElementById('clear-colors');
+            const allColorLabels = document.querySelectorAll('.color-label'); // Get all labels
+
+            // Function to update label class based on checkbox state
+            function updateLabelClass(checkbox) {
+                const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                if (label) {
+                    label.classList.toggle('is-checked', checkbox.checked);
+                }
+            }
+
+            // Initial state setup on page load
+            colorCheckboxes.forEach(checkbox => {
+                updateLabelClass(checkbox); // Set initial class based on server-rendered checked state
+                checkbox.addEventListener('change', () => {
+                    updateLabelClass(checkbox); // Update on change
                 });
             });
 
-            // Fix for card action overlays not showing on hover
+            // Fix for clear colors button
+            clearButton.addEventListener('click', function () {
+                colorCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    // Also remove the class from the label
+                    const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                    if (label) {
+                        label.classList.remove('is-checked');
+                    }
+                });
+            });
+
+            // Keep fixes for card actions and dropdowns
             const cardItems = document.querySelectorAll('.card-item');
             cardItems.forEach(item => {
                 item.addEventListener('mouseenter', function () {
@@ -439,7 +607,6 @@
                 });
             });
 
-            // Fix for dropdown menu
             const dropdowns = document.querySelectorAll('.dropdown');
             dropdowns.forEach(dropdown => {
                 dropdown.addEventListener('mouseenter', function () {

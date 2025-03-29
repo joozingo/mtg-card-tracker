@@ -3,12 +3,11 @@
 @section('content')
     <h1 style="margin-bottom: 1rem; font-size: 1.875rem; font-weight: bold;">MTG Card Database</h1>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <div class="search-form" style="flex: 1;">
+    <div class="flex flex-col md:flex-row md:items-center mb-4">
+        <div class="search-form w-full md:w-4/5 mb-4 md:mb-0">
             <form action="{{ route('cards.search') }}" method="GET">
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" name="name" class="search-input" placeholder="Search by card name..."
-                        style="flex: 1;">
+                    <input type="text" name="name" class="search-input" placeholder="Search by card name...">
                     <button type="submit" class="btn">Search</button>
                 </div>
                 <div style="margin-top: 0.5rem;">
@@ -20,7 +19,7 @@
             </form>
         </div>
 
-        <div class="sort-options" style="margin-left: 1rem;">
+        <div class="sort-options w-full md:w-1/5 md:ml-4">
             <form action="{{ route('cards.index') }}" method="GET" id="sortForm">
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <label for="sort" style="font-size: 0.875rem; color: #4a5568;">Sort by:</label>
@@ -134,11 +133,11 @@
 
                             <span
                                 style="text-transform: capitalize;
-                                                                                                                                            color: {{ $card->rarity == 'common' ? '#4a5568' :
+                                                                                                                                                                                                                                                        color: {{ $card->rarity == 'common' ? '#4a5568' :
                         ($card->rarity == 'uncommon' ? '#2d3748' :
                             ($card->rarity == 'rare' ? '#2c5282' :
                                 ($card->rarity == 'mythic' ? '#c05621' : '#4a5568'))) }};
-                                                                                                                                            font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
+                                                                                                                                                                                                                                                        font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
                                 {{ $card->rarity }}
                             </span>
                         </div>
