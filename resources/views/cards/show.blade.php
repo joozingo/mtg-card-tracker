@@ -116,17 +116,17 @@
 
         <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; position: relative;">
             <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-                @if($card->image_uri_normal)
-                    <div class="card-image-container"
-                        style="border-radius: 0.75rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); transition: transform 0.3s ease, box-shadow 0.3s ease;">
-                        <img style="width: 100%; display: block;" src="{{ $card->image_uri_normal }}" alt="{{ $card->name }}">
-                    </div>
-                @else
-                    <div
-                        style="height: 350px; display: flex; align-items: center; justify-content: center; background-color: #e2e8f0; color: #4a5568; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
-                        No Image
-                    </div>
-                @endif
+                <div class="card-image-container" style="flex-basis: 40%; margin-right: 2rem; text-align: center;">
+                    @if($card->getLocalOrScryfallImageUrl('normal'))
+                        <img src="{{ $card->getLocalOrScryfallImageUrl('normal') }}" alt="{{ $card->name }}"
+                            style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                    @else
+                        <div
+                            style="height: 350px; display: flex; align-items: center; justify-content: center; background-color: #e2e8f0; color: #4a5568; border-radius: 0.75rem; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">
+                            No Image
+                        </div>
+                    @endif
+                </div>
 
                 <div style="display: flex; gap: 0.5rem;">
                     <a href="{{ route('collection.create', $card->id) }}" class="action-button collection-button"
@@ -334,13 +334,13 @@
                             @foreach(json_decode($card->legalities) as $format => $legality)
                                 <div
                                     style="
-                                                                                                                                                            padding: 0.5rem;
-                                                                                                                                                            border-radius: 0.5rem;
-                                                                                                                                                            font-size: 0.875rem;
-                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
-                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                                                                                                                                                            transition: transform 0.2s ease;
-                                                                                                                                                        ">
+                                                                                                                                                                                    padding: 0.5rem;
+                                                                                                                                                                                    border-radius: 0.5rem;
+                                                                                                                                                                                    font-size: 0.875rem;
+                                                                                                                                                                                    background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
+                                                                                                                                                                                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                                                                                                                                                                                    transition: transform 0.2s ease;
+                                                                                                                                                                                ">
                                     <span
                                         style="text-transform: capitalize; font-weight: 500;">{{ str_replace('_', ' ', $format) }}</span>
                                     <span

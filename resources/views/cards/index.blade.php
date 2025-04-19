@@ -62,8 +62,8 @@
 
                     <div style="position: relative; overflow: hidden;">
                         <a href="{{ route('cards.show', $card->scryfall_id) }}">
-                            @if($card->image_uri_normal)
-                                <img class="card-image" src="{{ $card->image_uri_normal }}" alt="{{ $card->name }}"
+                            @if($card->getLocalOrScryfallImageUrl('normal'))
+                                <img class="card-image" src="{{ $card->getLocalOrScryfallImageUrl('normal') }}" alt="{{ $card->name }}"
                                     style="transition: transform 0.3s;">
                             @else
                                 <div
@@ -133,11 +133,11 @@
 
                             <span
                                 style="text-transform: capitalize;
-                                                                                                                                                                                                                                                        color: {{ $card->rarity == 'common' ? '#4a5568' :
+                                                                                                                                                                                                                                                                                color: {{ $card->rarity == 'common' ? '#4a5568' :
                         ($card->rarity == 'uncommon' ? '#2d3748' :
                             ($card->rarity == 'rare' ? '#2c5282' :
                                 ($card->rarity == 'mythic' ? '#c05621' : '#4a5568'))) }};
-                                                                                                                                                                                                                                                        font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
+                                                                                                                                                                                                                                                                                font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
                                 {{ $card->rarity }}
                             </span>
                         </div>

@@ -40,26 +40,40 @@ MTG Card Tracker is a web application built with Laravel designed to help Magic:
     *   Copy the example environment file: `cp .env.example .env`
     *   Configure your database connection details (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and any other necessary settings (like `APP_KEY`) in the `.env` file.
     *   Generate an application key: `php artisan key:generate`
+    *   **Important:** Set `APP_URL` to the address you use to access the application (e.g., `APP_URL=http://127.0.0.1:8000` if using `php artisan serve` defaults). This is crucial for generating correct URLs for cached images.
 5.  **Run Database Migrations:**
     ```bash
     php artisan migrate
     ```
-6.  **Build Frontend Assets:**
+6.  **Set Up Queue for Image Caching:**
+    *   Choose a queue driver in your `.env` file (e.g., `QUEUE_CONNECTION=database`).
+    *   If using the `database` driver, run: `php artisan queue:table` then `php artisan migrate`.
+    *   Refer to Laravel documentation for other drivers (Redis, etc.).
+7.  **Create Storage Link:** This makes cached images publicly accessible.
+    ```bash
+    php artisan storage:link
+    ```
+8.  **Build Frontend Assets:**
     ```bash
     npm run dev
     ```
     (Or `npm run build` for production assets)
-7.  **Import Card Data:** (Important!)
-    *   To populate the database with card information from Scryfall, run the import command:
+9.  **Import Card Data:** (Important!)
+    *   To populate the database with the latest card information from Scryfall (Oracle Cards dataset), run the import command. It will automatically download the data file to `storage/app/private/`.
         ```bash
-        php artisan app:import-cards
+        php artisan app:import-scryfall-data
         ```
     *   *Note: This initial import can take a significant amount of time depending on the Scryfall bulk data size.*
-8.  **Serve the Application:**
+10. **Run Queue Worker:** Start a queue worker to process background jobs like image caching.
+    ```bash
+    php artisan queue:work --queue=image-caching
+    ```
+    (You may want to use Supervisor or similar to run this continuously in production).
+11. **Serve the Application:**
     ```bash
     php artisan serve
     ```
-    You can then access the application at `http://localhost:8000` (or the specified port).
+    You can then access the application at the URL specified in your `APP_URL` (e.g., `http://127.0.0.1:8000`).
 
 ## Usage
 

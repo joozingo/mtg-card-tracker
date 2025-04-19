@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Jobs\CacheCardImage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class Card extends Model
 {
@@ -117,5 +120,38 @@ class Card extends Model
             return false;
         }
         return $this->hasOne(Wishlist::class)->where('user_id', auth()->id())->exists();
+    }
+
+    /**
+     * Get the local cached image URL or the Scryfall URL,
+     * and dispatch a job to cache if not found locally.
+     */
+    public function getLocalOrScryfallImageUrl(string $size = 'normal'): ?string
+    {
+        // Generate the expected relative path in the public disk
+        $prefix = substr($this->scryfall_id, 0, 2);
+        $filename = $this->scryfall_id . '.jpg';
+        $relativePath = "card_images/{$size}/{$prefix}/{$filename}";
+
+        // Check if the file exists in the public storage
+        if (Storage::disk('public')->exists($relativePath)) {
+            // Return the public URL
+            return Storage::disk('public')->url($relativePath);
+        }
+
+        // File not cached, return the Scryfall URL
+        $scryfallUrl = match ($size) {
+            'small' => $this->image_uri_small,
+            'large' => $this->image_uri_large,
+            default => $this->image_uri_normal,
+        };
+
+        // If we have a Scryfall URL, dispatch the caching job
+        if ($scryfallUrl) {
+            CacheCardImage::dispatch($this, $size)->onQueue('image-caching'); // Dispatch to a specific queue if needed
+        }
+
+        // Return the original Scryfall URL (or null if none exists)
+        return $scryfallUrl;
     }
 }

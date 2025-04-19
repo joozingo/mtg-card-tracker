@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Card;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class ImportScryfallData extends Command
@@ -14,36 +15,111 @@ class ImportScryfallData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:import-scryfall-data {file}';
+    protected $signature = 'app:import-scryfall-data';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Import Scryfall bulk data into the cards table';
+    protected $description = 'Download latest Scryfall Oracle Cards data and import it';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $filePath = $this->argument('file');
-        $chunkSize = 1000; // Default chunk size
+        $downloadPath = 'private'; // Relative to storage/app
+        $bulkDataType = 'oracle-cards';
+        $scryfallApiUrl = "https://api.scryfall.com/bulk-data/{$bulkDataType}";
+        $downloadedFilePath = null;
 
-        if (!file_exists($filePath)) {
-            $this->error("File not found: {$filePath}");
+        $this->info("Fetching latest Scryfall bulk data information ({$bulkDataType})...");
+
+        try {
+            // 1. Get Bulk Data Info
+            $response = Http::withoutVerifying()->get($scryfallApiUrl);
+
+            if (!$response->successful()) {
+                $this->error("Failed to fetch bulk data info from Scryfall. Status: " . $response->status());
+                return 1;
+            }
+
+            $bulkDataInfo = $response->json();
+            $downloadUri = $bulkDataInfo['download_uri'] ?? null;
+            $bulkDataUpdatedAt = $bulkDataInfo['updated_at'] ?? 'unknown';
+
+            if (!$downloadUri) {
+                $this->error("Could not find download URI in Scryfall response.");
+                return 1;
+            }
+
+            $this->info("Latest data timestamp: {$bulkDataUpdatedAt}");
+
+            // 2. Prepare Download
+            $filename = basename($downloadUri);
+            $targetPath = storage_path("app/{$downloadPath}/{$filename}"); // Full path for Http::sink
+            $relativeTargetPath = "{$downloadPath}/{$filename}"; // Relative path for Storage facade
+
+            // Ensure target directory exists
+            Storage::disk('local')->makeDirectory($downloadPath);
+
+            // Check if this exact file already exists
+            if (Storage::disk('local')->exists($relativeTargetPath)) {
+                $this->info("Latest data file ({$filename}) already downloaded. Skipping download.");
+                $downloadedFilePath = $targetPath;
+            } else {
+                // 3. Download File
+                $this->info("Downloading {$filename} to storage/{$downloadPath}...");
+                $downloadResponse = Http::withoutVerifying()->sink($targetPath)->get($downloadUri);
+
+                if (!$downloadResponse->successful()) {
+                    // Clean up potentially partial file
+                    Storage::disk('local')->delete($relativeTargetPath);
+                    $this->error("Download failed. Status: " . $downloadResponse->status());
+                    return 1;
+                }
+                $this->info("Download complete.");
+                $downloadedFilePath = $targetPath;
+            }
+
+        } catch (\Exception $e) {
+            $this->error("An error occurred during download/preparation: " . $e->getMessage());
             return 1;
         }
 
-        $this->info("Importing Scryfall data from {$filePath}");
+        // Proceed with import using the downloaded file path
+        if (!$downloadedFilePath) {
+            $this->error("Could not determine file path for import.");
+            return 1;
+        }
+
+        $filePath = $downloadedFilePath; // Use the downloaded file
+        $chunkSize = 1000;
+
+        $this->info("\nImporting Scryfall data from {$filename}"); // Use filename for message
         $this->info("This may take a while depending on the file size...");
 
-        // Begin a transaction
-        DB::beginTransaction();
+        // Truncate the table FIRST (outside the main import transaction)
+        try {
+            $this->info("Disabling foreign key checks...");
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            $this->info("Truncating existing cards data...");
+            DB::table('cards')->truncate();
+            $this->info("Re-enabling foreign key checks."); // Corrected message
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } catch (\Exception $e) {
+            // If truncate fails, re-enable checks if possible and exit
+            $this->error("Failed to truncate table: " . $e->getMessage());
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // Attempt to re-enable
+            return 1;
+        }
 
+        // Now, begin transaction specifically for the import process
+        DB::beginTransaction();
         try {
             // Read the file
+            $this->info("Starting card import process..."); // Added info message
             $handle = fopen($filePath, 'r');
 
             if (!$handle) {
@@ -161,10 +237,10 @@ class ImportScryfallData extends Command
             $this->info("\nSuccessfully imported {$processedCount} cards");
 
         } catch (\Exception $e) {
-            // Roll back the transaction in case of error
+            // Roll back the transaction in case of error during import
             DB::rollBack();
 
-            $this->error("\nImport failed: " . $e->getMessage());
+            $this->error("\nImport failed during card processing: " . $e->getMessage());
             return 1;
         }
 
