@@ -14,13 +14,14 @@ MTG Card Tracker is a web application built with Laravel designed to help Magic:
 *   **User Accounts:** Securely manage your personal collection, wishlists, and decks.
 *   **Responsive Design:** Usable interface across desktop, tablet, and mobile devices.
 *   **Set Sorting:** Sort card sets by name, code, or card count.
+*   **Currency Selector:** Display card prices in the user's chosen currency (USD, EUR, GBP) with daily rate synchronization from Exchange Rate API.
 
 ## Technology Stack
 
 *   **Backend:** Laravel 10.x
 *   **Frontend:** Blade Templates, Tailwind CSS (via Vite)
 *   **Database:** Configurable via Laravel's `.env` (e.g., MySQL, PostgreSQL)
-*   **External API:** Scryfall API for card data
+*   **External API:** Scryfall API for card data; Exchange Rate API for currency conversion.
 
 ## Setup and Installation
 
@@ -42,6 +43,11 @@ MTG Card Tracker is a web application built with Laravel designed to help Magic:
     *   Configure your database connection details (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) and any other necessary settings (like `APP_KEY`) in the `.env` file.
     *   Generate an application key: `php artisan key:generate`
     *   **Important:** Set `APP_URL` to the address you use to access the application (e.g., `APP_URL=http://127.0.0.1:8000` if using `php artisan serve` defaults). This is crucial for generating correct URLs for cached images.
+    *   Set your Exchange Rate API key and base URL in the **.env** file:
+      ```bash
+      EXCHANGE_RATE_API_KEY=your_api_key_here
+      EXCHANGE_RATE_API_BASE_URL=https://v6.exchangerate-api.com/v6
+      ```
 5.  **Run Database Migrations:**
     ```bash
     php artisan migrate
@@ -70,7 +76,17 @@ MTG Card Tracker is a web application built with Laravel designed to help Magic:
     php artisan queue:work --queue=image-caching
     ```
     (You may want to use Supervisor or similar to run this continuously in production).
-11. **Serve the Application:**
+11. **Sync Exchange Rates:**
+    Fetch the initial USD→GBP/EUR rates by running:
+    ```bash
+    php artisan app:sync-exchange-rates
+    ```
+12. **Enable Scheduler:**
+    Add the following to your server's crontab to ensure daily synchronization:
+    ```cron
+    * * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+    ```
+13. **Serve the Application:**
     ```bash
     php artisan serve
     ```

@@ -328,17 +328,12 @@
                     <div class="stat-box"
                         style="padding: 1rem; background-color: #c6f6d5; border-radius: 0.5rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;">
                         <h2 style="margin: 0 0 0.5rem; font-size: 1.125rem; font-weight: bold; color: #38a169;">Price</h2>
-                        @if($card->price_usd)
-                            <p style="margin: 0; display: flex; justify-content: space-between;"><span>USD:</span>
-                                <strong>${{ number_format($card->price_usd, 2) }}</strong>
+                        @if($card->converted_price)
+                            <p style="margin: 0; display: flex; justify-content: space-between;">
+                                <span>{{ session('currency', 'USD') }}:</span>
+                                <strong>{{ $card->price_symbol }}{{ number_format($card->converted_price, 2) }}</strong>
                             </p>
-                        @endif
-                        @if($card->price_eur)
-                            <p style="margin: 0.25rem 0 0; display: flex; justify-content: space-between;"><span>EUR:</span>
-                                <strong>€{{ number_format($card->price_eur, 2) }}</strong>
-                            </p>
-                        @endif
-                        @if(!$card->price_usd && !$card->price_eur)
+                        @else
                             <p style="margin: 0; text-align: center;">No price information available</p>
                         @endif
                     </div>
@@ -357,13 +352,13 @@
                             @foreach(json_decode($card->legalities) as $format => $legality)
                                 <div
                                     style="
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            padding: 0.5rem;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 0.5rem;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            font-size: 0.875rem;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            transition: transform 0.2s ease;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            padding: 0.5rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 0.5rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            font-size: 0.875rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            transition: transform 0.2s ease;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ">
                                     <span
                                         style="text-transform: capitalize; font-weight: 500;">{{ str_replace('_', ' ', $format) }}</span>
                                     <span
@@ -377,6 +372,22 @@
                         @endif
                     </div>
                 </div>
+
+                @if($card->rulings->isNotEmpty())
+                    <div class="rulings-box"
+                        style="margin-top: 1.5rem; padding: 1.25rem; background-color: #f7fafc; border-radius: 0.5rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                        <h2 style="margin: 0 0 0.75rem; font-size: 1.25rem; font-weight: bold;">Rulings</h2>
+                        @foreach($card->rulings as $ruling)
+                            <div style="margin-bottom: 1rem;">
+                                <span
+                                    style="font-size: 0.875rem; color: #4a5568;">{{ $ruling->published_at->format('M d, Y') }}</span>
+                                <p style="margin: 0.25rem 0 0; line-height: 1.5;">{{ $ruling->comment }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p style="margin-top: 1.5rem; color: #4a5568; text-align: center;">No rulings available for this card.</p>
+                @endif
             </div>
         </div>
     </div>
@@ -407,6 +418,7 @@
         .card-text-box:hover,
         .stat-box:hover,
         .legality-box>div:hover,
+        .rulings-box>div:hover,
         .artist-box:hover,
         .flavor-text-box:hover {
             transform: translateY(-2px);

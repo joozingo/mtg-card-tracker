@@ -227,20 +227,20 @@
 
                                 <span
                                     style="text-transform: capitalize;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                color: {{ $card->rarity == 'common' ? '#4a5568' :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                color: {{ $card->rarity == 'common' ? '#4a5568' :
                                 ($card->rarity == 'uncommon' ? '#2d3748' :
                                     ($card->rarity == 'rare' ? '#2c5282' :
                                         ($card->rarity == 'mythic' ? '#c05621' : '#4a5568'))) }};
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                font-weight: {{ $card->rarity == 'common' ? 'normal' : 'bold' }};">
                                     {{ $card->rarity }}
                                 </span>
                             </div>
 
                             <!-- Price tag if available -->
-                            @if($card->price_usd)
+                            @if($card->converted_price)
                                 <div
                                     style="position: absolute; top: 10px; left: 10px; background-color: rgba(34, 84, 61, 0.9); color: white; border-radius: 0.25rem; padding: 0.125rem 0.375rem; font-size: 0.75rem; font-weight: 500; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
-                                    ${{ number_format($card->price_usd, 2) }}
+                                    {{ $card->price_symbol }}{{ number_format($card->converted_price, 2) }}
                                 </div>
                             @endif
                         </div>

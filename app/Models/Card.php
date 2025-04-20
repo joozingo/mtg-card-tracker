@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Jobs\CacheCardImage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ExchangeRate;
+use Illuminate\Support\Facades\Session;
 
 class Card extends Model
 {
@@ -153,5 +155,39 @@ class Card extends Model
 
         // Return the original Scryfall URL (or null if none exists)
         return $scryfallUrl;
+    }
+
+    /**
+     * Get the price converted based on selected currency.
+     */
+    public function getConvertedPriceAttribute()
+    {
+        $currency = Session::get('currency', 'USD');
+        if ($currency === 'USD') {
+            return $this->price_usd;
+        }
+        $rate = ExchangeRate::where('currency', $currency)->value('rate');
+        return $this->price_usd * ($rate ?? 1);
+    }
+
+    /**
+     * Get currency symbol based on selected currency.
+     */
+    public function getPriceSymbolAttribute()
+    {
+        $currency = Session::get('currency', 'USD');
+        return match ($currency) {
+            'EUR' => '€',
+            'GBP' => '£',
+            default => '$',
+        };
+    }
+
+    /**
+     * Get the rulings for this card.
+     */
+    public function rulings()
+    {
+        return $this->hasMany(Ruling::class, 'oracle_id', 'oracle_id')->orderBy('published_at');
     }
 }

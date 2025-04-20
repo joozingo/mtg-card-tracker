@@ -29,7 +29,7 @@ class ImportScryfallData extends Command
      */
     public function handle()
     {
-        $bulkDataType = 'oracle-cards';
+        $bulkDataType = 'default-cards';
         $scryfallApiUrl = "https://api.scryfall.com/bulk-data/{$bulkDataType}";
         $downloadedFilePath = null;
 
@@ -244,6 +244,53 @@ class ImportScryfallData extends Command
             $this->error("\nImport failed during card processing: " . $e->getMessage());
             return 1;
         }
+
+        // After card import and cleanup
+        $this->info("
+Importing card data complete. Now fetching rulings bulk data...");
+        // Fetch rulings bulk-data info
+        $rulingsType = 'rulings';
+        $rulingsInfoResponse = Http::withoutVerifying()->get("https://api.scryfall.com/bulk-data/{$rulingsType}");
+        if ($rulingsInfoResponse->successful()) {
+            $rulingsInfo = $rulingsInfoResponse->json();
+            $rulingsUri = $rulingsInfo['download_uri'] ?? null;
+            if ($rulingsUri) {
+                $rulingsFile = basename($rulingsUri);
+                $rulingsPath = storage_path("app/private/{$rulingsFile}");
+                // Download rulings file
+                Http::withoutVerifying()->sink($rulingsPath)->get($rulingsUri);
+                $handle = fopen($rulingsPath, 'r');
+                if ($handle) {
+                    // Truncate existing rulings
+
+                    \App\Models\Ruling::truncate();
+
+                    while (!feof($handle)) {
+                        $line = fgets($handle);
+                        if (!$line || trim($line) === '[' || trim($line) === ']')
+                            continue;
+                        if (substr(rtrim($line), -1) === ',') {
+                            $line = substr(rtrim($line), 0, -1);
+                        }
+                        $data = json_decode($line, true);
+                        if (isset($data['oracle_id'], $data['comment'], $data['published_at'])) {
+                            \App\Models\Ruling::updateOrCreate(
+                                [
+                                    'oracle_id' => $data['oracle_id'],
+                                    'published_at' => $data['published_at'],
+                                ],
+                                ['comment' => $data['comment']]
+                            );
+                        }
+                    }
+                    fclose($handle);
+                    $this->info('Rulings imported successfully.');
+                }
+                // Cleanup rulings file
+                Storage::disk('local')->delete($rulingsFile);
+            }
+        }
+        // End of rulings import
 
         return 0;
     }

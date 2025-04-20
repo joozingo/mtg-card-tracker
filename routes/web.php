@@ -6,6 +6,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DeckController;
 use App\Http\Controllers\CardController;
 use App\Http\Controllers\SetController;
+use App\Http\Controllers\CurrencyController;
 use App\Models\Card;
 use Illuminate\Support\Facades\Route;
 
@@ -151,5 +152,8 @@ Route::post('/cards/{card}/refresh-image', [CardController::class, 'refreshImage
 // Set routes (publicly accessible)
 Route::get('/sets', [SetController::class, 'index'])->name('sets.index');
 Route::get('/sets/{set}', [SetController::class, 'show'])->name('sets.show');
+
+// Route for setting currency preference
+Route::post('/currency/set', [CurrencyController::class, 'set'])->name('currency.set');
 
 require __DIR__ . '/auth.php';

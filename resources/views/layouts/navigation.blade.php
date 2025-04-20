@@ -12,26 +12,49 @@
                 </svg>
             </button>
             <div class="desktop-menu">
-                <a href="{{ route('cards.index') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
-                    Browse Cards
-                </a>
-                <a href="{{ route('cards.search') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
-                    Advanced Search
-                </a>
-                <a href="{{ route('sets.index') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
-                    Browse Sets
-                </a>
-                <a href="{{ route('collection.index') }}"
-                    style="color: white; text-decoration: none; margin-left: 1rem;">
-                    My Collection
-                </a>
-                <a href="{{ route('wishlist.index') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
-                    My Wishlist
-                </a>
-                <a href="{{ route('decks.index') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
-                    My Decks
-                </a>
-
+                <!-- Browse Cards dropdown -->
+                <div class="relative inline-block" style="margin-left: 1rem;">
+                    <button type="button" onclick="toggleBrowseMenu()"
+                        class="flex items-center text-white focus:outline-none">
+                        <span>Browse Cards</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="ml-1 h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.293 7.293 9.586 11.586 13.879 7.293" />
+                        </svg>
+                    </button>
+                    <div id="browseMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
+                        style="z-index: 10;">
+                        <a href="{{ route('cards.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Browse Cards</a>
+                        <a href="{{ route('cards.search') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Advanced Search</a>
+                        <a href="{{ route('sets.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Browse Sets</a>
+                    </div>
+                </div>
+                <!-- Collection dropdown -->
+                <div class="relative inline-block" style="margin-left: 1rem;">
+                    <button type="button" onclick="toggleCollectionMenu()"
+                        class="flex items-center text-white focus:outline-none">
+                        <span>My Collection</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="ml-1 h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.293 7.293 9.586 11.586 13.879 7.293" />
+                        </svg>
+                    </button>
+                    <div id="collectionMenu"
+                        class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
+                        style="z-index: 10;">
+                        <a href="{{ route('collection.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Collection</a>
+                        <a href="{{ route('wishlist.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Wishlist</a>
+                        <a href="{{ route('decks.index') }}"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Decks</a>
+                    </div>
+                </div>
                 @auth
                     <div class="ml-4 relative" style="margin-left: 1rem;">
                         <div>
@@ -69,6 +92,29 @@
                         Register
                     </a>
                 @endauth
+
+                <!-- Currency dropdown -->
+                <div class="relative inline-block" style="margin-left: 1rem;">
+                    <button type="button" onclick="toggleCurrencyMenu()"
+                        class="flex items-center text-white focus:outline-none">
+                        <span>{{ session('currency', 'USD') }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                            class="ml-1 h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.293 7.293 9.586 11.586 13.879 7.293" />
+                        </svg>
+                    </button>
+                    <div id="currencyMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
+                        style="z-index: 10;">
+                        @foreach(['USD', 'EUR', 'GBP'] as $cur)
+                            <form method="POST" action="{{ route('currency.set') }}" class="m-0">
+                                @csrf
+                                <button type="submit" name="currency" value="{{ $cur }}"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ $cur }}</button>
+                            </form>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
         <div class="mobile-menu" id="mobileMenu">
@@ -106,4 +152,8 @@
         const userMenu = document.getElementById('userMenu');
         userMenu.classList.toggle('hidden');
     }
+
+    function toggleBrowseMenu() { document.getElementById('browseMenu').classList.toggle('hidden'); }
+    function toggleCollectionMenu() { document.getElementById('collectionMenu').classList.toggle('hidden'); }
+    function toggleCurrencyMenu() { document.getElementById('currencyMenu').classList.toggle('hidden'); }
 </script>

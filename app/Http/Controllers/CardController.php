@@ -134,7 +134,7 @@ class CardController extends Controller
      */
     public function show(string $id)
     {
-        $card = Card::with('collections')->where('scryfall_id', $id)->firstOrFail();
+        $card = Card::with(['collections', 'rulings'])->where('scryfall_id', $id)->firstOrFail();
         return view('cards.show', compact('card'));
     }
 
