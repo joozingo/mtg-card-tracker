@@ -93,9 +93,19 @@
         $gradient = getColorGradient($card);
         $cardTypeIcon = getCardTypeIcon($card);
 
-        // Card text formatting
-        $formattedText = $card->oracle_text;
-        $formattedText = preg_replace('/\{([WUBRGCTP0-9\/]+)\}/', '<span class="mana-symbol">$1</span>', $formattedText);
+        // Mana sprite symbol formatting helper
+        function formatManaSymbols($text)
+        {
+            $escaped = e($text);
+            return preg_replace_callback('/\{([^}]+)\}/u', function ($matches) {
+                $symbol = $matches[1];
+                $class = 'mana-' . str_replace(['/', ',', '½', '∞'], ['-', '', 'half', 'infinity'], $symbol);
+                return '<span class="mana-symbol ' . $class . '"></span>';
+            }, $escaped);
+        }
+        // Format oracle text and mana cost
+        $formattedText = nl2br(formatManaSymbols($card->oracle_text));
+        $formattedManaCost = formatManaSymbols($card->mana_cost);
     @endphp
 
     <div
@@ -108,7 +118,9 @@
             </h1>
             <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
                 <span
-                    style="font-size: 0.875rem; background-color: rgba(255, 255, 255, 0.5); padding: 0.25rem 0.5rem; border-radius: 0.25rem; backdrop-filter: blur(5px);">{{ $card->mana_cost }}</span>
+                    style="font-size: 0.875rem; background-color: rgba(255, 255, 255, 0.5); padding: 0.25rem 0.5rem; border-radius: 0.25rem; backdrop-filter: blur(5px);">
+                    {!! $formattedManaCost !!}
+                </span>
                 <span
                     style="font-size: 0.875rem; background-color: rgba(255, 255, 255, 0.5); padding: 0.25rem 0.5rem; border-radius: 0.25rem; backdrop-filter: blur(5px); display: flex; align-items: center; gap: 0.25rem;">
                     <span
@@ -132,11 +144,12 @@
                             No Image
                         </div>
                     @endif
-                    <form action="{{ route('cards.refresh-image', $card->scryfall_id) }}" method="POST" class="mt-2">
-                        @csrf
-                        <button type="submit" class="btn">Refresh Image</button>
-                    </form>
                 </div>
+
+                <form action="{{ route('cards.refresh-image', $card->scryfall_id) }}" method="POST" class="mt-2">
+                    @csrf
+                    <button type="submit" class="btn">Refresh Image</button>
+                </form>
 
                 <div style="display: flex; gap: 0.5rem;">
                     <a href="{{ route('collection.create', $card->id) }}" class="action-button collection-button"
@@ -267,7 +280,7 @@
                     style="margin-bottom: 1.5rem; padding: 1.25rem; background-color: #f7fafc; border-radius: 0.5rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease;">
                     <h2 style="margin: 0 0 0.75rem; font-size: 1.25rem; font-weight: bold;">Card Text</h2>
                     <div class="oracle-text" style="white-space: pre-line; line-height: 1.6;">
-                        {!! nl2br(e($card->oracle_text)) !!}
+                        {!! $formattedText !!}
                     </div>
                 </div>
 
@@ -344,13 +357,13 @@
                             @foreach(json_decode($card->legalities) as $format => $legality)
                                 <div
                                     style="
-                                                                                                                                                                                                            padding: 0.5rem;
-                                                                                                                                                                                                            border-radius: 0.5rem;
-                                                                                                                                                                                                            font-size: 0.875rem;
-                                                                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
-                                                                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                                                                                                                                                                                                            transition: transform 0.2s ease;
-                                                                                                                                                                                                        ">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            padding: 0.5rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            border-radius: 0.5rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            font-size: 0.875rem;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            transition: transform 0.2s ease;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ">
                                     <span
                                         style="text-transform: capitalize; font-weight: 500;">{{ str_replace('_', ' ', $format) }}</span>
                                     <span
@@ -400,16 +413,247 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
+        :root {
+            --msm: 0.4;
+            --mw: 20px;
+            --mh: 20px;
+        }
+
         .mana-symbol {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 50%;
-            background-color: #e2e8f0;
-            font-weight: bold;
-            margin: 0 0.125rem;
+            display: inline-block;
+            background-image: url({{ asset('images/mana-sprite.png') }});
+            background-repeat: no-repeat;
+            vertical-align: middle;
+            width: var(--mw);
+            height: var(--mh);
+            background-size: calc(500px * var(--msm)) calc(432px * var(--msm));
+        }
+
+        /* Basic colors */
+        .mana-U {
+            background-position: calc(0px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-W {
+            background-position: calc(-50px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-B {
+            background-position: calc(-100px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-R {
+            background-position: calc(-150px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-G {
+            background-position: calc(-200px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-S {
+            background-position: calc(-250px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-T {
+            background-position: calc(-400px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        .mana-Q {
+            background-position: calc(-450px * var(--msm)) calc(0px * var(--msm));
+        }
+
+        /* Generic mana 0-9 */
+        .mana-0 {
+            background-position: calc(0px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-1 {
+            background-position: calc(-50px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-2 {
+            background-position: calc(-100px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-3 {
+            background-position: calc(-150px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-4 {
+            background-position: calc(-200px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-5 {
+            background-position: calc(-250px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-6 {
+            background-position: calc(-300px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-7 {
+            background-position: calc(-350px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-8 {
+            background-position: calc(-400px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        .mana-9 {
+            background-position: calc(-450px * var(--msm)) calc(-50px * var(--msm));
+        }
+
+        /* Generic mana 10-19 */
+        .mana-10 {
+            background-position: calc(0px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-11 {
+            background-position: calc(-50px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-12 {
+            background-position: calc(-100px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-13 {
+            background-position: calc(-150px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-14 {
+            background-position: calc(-200px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-15 {
+            background-position: calc(-250px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-16 {
+            background-position: calc(-300px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-17 {
+            background-position: calc(-350px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-18 {
+            background-position: calc(-400px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        .mana-19 {
+            background-position: calc(-450px * var(--msm)) calc(-100px * var(--msm));
+        }
+
+        /* Generic mana 20 */
+        .mana-20 {
+            background-position: calc(0px * var(--msm)) calc(-150px * var(--msm));
+        }
+
+        /* Huge generic and special */
+        .mana-1000000 {
+            width: calc(6 * var(--mw));
+            background-position: calc(-50px * var(--msm)) calc(-150px * var(--msm));
+        }
+
+        .mana-100 {
+            width: calc(2 * var(--mw));
+            background-position: calc(-400px * var(--msm)) calc(-250px * var(--msm));
+        }
+
+        .mana-X {
+            background-position: calc(-350px * var(--msm)) calc(-150px * var(--msm));
+        }
+
+        .mana-Y {
+            background-position: calc(-400px * var(--msm)) calc(-150px * var(--msm));
+        }
+
+        .mana-Z {
+            background-position: calc(-450px * var(--msm)) calc(-150px * var(--msm));
+        }
+
+        .mana-half {
+            background-position: calc(-400px * var(--msm)) calc(-200px * var(--msm));
+        }
+
+        .mana-infinity {
+            background-position: calc(-450px * var(--msm)) calc(-200px * var(--msm));
+        }
+
+        /* Hybrid mana symbols */
+        .mana-U-R {
+            background-position: calc(0px * var(--msm)) calc(-200px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-U-B {
+            background-position: calc(-50px * var(--msm)) calc(-200px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-B-R {
+            background-position: calc(-100px * var(--msm)) calc(-200px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-B-G {
+            background-position: calc(-150px * var(--msm)) calc(-200px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-G-U {
+            background-position: calc(-200px * var(--msm)) calc(-200px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-G-W {
+            background-position: calc(0px * var(--msm)) calc(-300px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-R-G {
+            background-position: calc(-50px * var(--msm)) calc(-300px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-R-W {
+            background-position: calc(-100px * var(--msm)) calc(-300px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-W-B {
+            background-position: calc(-150px * var(--msm)) calc(-300px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-W-U {
+            background-position: calc(-200px * var(--msm)) calc(-300px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-2-W {
+            background-position: calc(0px * var(--msm)) calc(-350px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-2-U {
+            background-position: calc(-50px * var(--msm)) calc(-350px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-2-B {
+            background-position: calc(-100px * var(--msm)) calc(-350px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-2-R {
+            background-position: calc(-150px * var(--msm)) calc(-350px * var(--msm));
+            transform: scale(0.5);
+        }
+
+        .mana-2-G {
+            background-position: calc(-200px * var(--msm)) calc(-350px * var(--msm));
+            transform: scale(0.5);
         }
 
         /* Mobile responsiveness */
