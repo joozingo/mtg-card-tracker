@@ -13,6 +13,7 @@ MTG Card Tracker is a web application built with Laravel designed to help Magic:
 *   **Deck Management:** Build and manage your MTG decks.
 *   **User Accounts:** Securely manage your personal collection, wishlists, and decks.
 *   **Responsive Design:** Usable interface across desktop, tablet, and mobile devices.
+*   **Set Sorting:** Sort card sets by name, code, or card count.
 
 ## Technology Stack
 
