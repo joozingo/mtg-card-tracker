@@ -29,7 +29,6 @@ class ImportScryfallData extends Command
      */
     public function handle()
     {
-        $downloadPath = 'private'; // Relative to storage/app
         $bulkDataType = 'oracle-cards';
         $scryfallApiUrl = "https://api.scryfall.com/bulk-data/{$bulkDataType}";
         $downloadedFilePath = null;
@@ -58,11 +57,8 @@ class ImportScryfallData extends Command
 
             // 2. Prepare Download
             $filename = basename($downloadUri);
-            $targetPath = storage_path("app/{$downloadPath}/{$filename}"); // Full path for Http::sink
-            $relativeTargetPath = "{$downloadPath}/{$filename}"; // Relative path for Storage facade
-
-            // Ensure target directory exists
-            Storage::disk('local')->makeDirectory($downloadPath);
+            $targetPath = storage_path("app/private/{$filename}"); // Full path for Http::sink
+            $relativeTargetPath = "{$filename}"; // Relative path for Storage facade
 
             // Check if this exact file already exists
             if (Storage::disk('local')->exists($relativeTargetPath)) {
@@ -70,7 +66,7 @@ class ImportScryfallData extends Command
                 $downloadedFilePath = $targetPath;
             } else {
                 // 3. Download File
-                $this->info("Downloading {$filename} to storage/{$downloadPath}...");
+                $this->info("Downloading {$filename} to storage...");
                 $downloadResponse = Http::withoutVerifying()->sink($targetPath)->get($downloadUri);
 
                 if (!$downloadResponse->successful()) {
@@ -235,6 +231,11 @@ class ImportScryfallData extends Command
             DB::commit();
 
             $this->info("\nSuccessfully imported {$processedCount} cards");
+
+            // Cleanup downloaded Scryfall data files
+            $this->info("Cleaning up downloaded Scryfall data files...");
+            Storage::disk('local')->delete($relativeTargetPath);
+            $this->info("Cleanup complete.");
 
         } catch (\Exception $e) {
             // Roll back the transaction in case of error during import

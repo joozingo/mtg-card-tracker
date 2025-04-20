@@ -3,7 +3,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <a href="{{ route('dashboard') }}"
                 style="color: white; text-decoration: none; font-size: 1.5rem; font-weight: bold;">
-                MTG Card Tracker
+                MTG Card Nexus
             </a>
             <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"

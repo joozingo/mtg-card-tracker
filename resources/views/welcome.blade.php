@@ -5,7 +5,7 @@
         <div style="text-align: center; margin-bottom: 3rem;">
             <h1
                 style="font-size: 3rem; font-weight: bold; background: linear-gradient(135deg, #4a5568, #2d3748); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem;">
-                MTG Card Tracker
+                MTG Card Nexus
             </h1>
             <p style="font-size: 1.25rem; color: #718096; max-width: 800px; margin: 0 auto;">
                 Track your Magic: The Gathering collection, build decks, and manage your cards all in one place.
