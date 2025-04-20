@@ -18,6 +18,9 @@
                 <a href="{{ route('cards.search') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
                     Advanced Search
                 </a>
+                <a href="{{ route('sets.index') }}" style="color: white; text-decoration: none; margin-left: 1rem;">
+                    Browse Sets
+                </a>
                 <a href="{{ route('collection.index') }}"
                     style="color: white; text-decoration: none; margin-left: 1rem;">
                     My Collection
@@ -71,6 +74,7 @@
         <div class="mobile-menu" id="mobileMenu">
             <a href="{{ route('cards.index') }}">Browse Cards</a>
             <a href="{{ route('cards.search') }}">Advanced Search</a>
+            <a href="{{ route('sets.index') }}">Browse Sets</a>
             <a href="{{ route('collection.index') }}">My Collection</a>
             <a href="{{ route('wishlist.index') }}">My Wishlist</a>
             <a href="{{ route('decks.index') }}">My Decks</a>

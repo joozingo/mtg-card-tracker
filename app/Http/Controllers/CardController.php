@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Card;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use App\Jobs\CacheCardImage;
 
 class CardController extends Controller
 {
@@ -174,5 +176,22 @@ class CardController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Refresh the cached image for a specific card.
+     */
+    public function refreshImage(string $id)
+    {
+        $card = Card::where('scryfall_id', $id)->firstOrFail();
+        // Delete existing cached images and dispatch caching jobs for each size
+        $prefix = substr($card->scryfall_id, 0, 2);
+        foreach (['small', 'normal', 'large'] as $size) {
+            $relativePath = "card_images/{$size}/{$prefix}/{$card->scryfall_id}.jpg";
+            Storage::disk('public')->delete($relativePath);
+            CacheCardImage::dispatch($card, $size)->onQueue('image-caching');
+        }
+
+        return back()->with('status', 'Image cache refresh queued.');
     }
 }

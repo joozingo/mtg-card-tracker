@@ -8,6 +8,12 @@
         </a>
     </div>
 
+    @if(session('status'))
+        <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">
+            {{ session('status') }}
+        </div>
+    @endif
+
     @php
         // Helper functions for card colors
         function getColorIdentityClass($card)
@@ -126,6 +132,10 @@
                             No Image
                         </div>
                     @endif
+                    <form action="{{ route('cards.refresh-image', $card->scryfall_id) }}" method="POST" class="mt-2">
+                        @csrf
+                        <button type="submit" class="btn">Refresh Image</button>
+                    </form>
                 </div>
 
                 <div style="display: flex; gap: 0.5rem;">
@@ -334,13 +344,13 @@
                             @foreach(json_decode($card->legalities) as $format => $legality)
                                 <div
                                     style="
-                                                                                                                                                                                    padding: 0.5rem;
-                                                                                                                                                                                    border-radius: 0.5rem;
-                                                                                                                                                                                    font-size: 0.875rem;
-                                                                                                                                                                                    background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
-                                                                                                                                                                                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                                                                                                                                                                                    transition: transform 0.2s ease;
-                                                                                                                                                                                ">
+                                                                                                                                                                                                            padding: 0.5rem;
+                                                                                                                                                                                                            border-radius: 0.5rem;
+                                                                                                                                                                                                            font-size: 0.875rem;
+                                                                                                                                                                                                            background-color: {{ $legality === 'legal' ? '#c6f6d5' : ($legality === 'not_legal' ? '#fed7d7' : '#e2e8f0') }};
+                                                                                                                                                                                                            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                                                                                                                                                                                                            transition: transform 0.2s ease;
+                                                                                                                                                                                                        ">
                                     <span
                                         style="text-transform: capitalize; font-weight: 500;">{{ str_replace('_', ' ', $format) }}</span>
                                     <span

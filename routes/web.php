@@ -5,6 +5,7 @@ use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\DeckController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\SetController;
 use App\Models\Card;
 use Illuminate\Support\Facades\Route;
 
@@ -145,5 +146,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/cards', [CardController::class, 'index'])->name('cards.index');
 Route::get('/cards/search', [CardController::class, 'search'])->name('cards.search');
 Route::get('/cards/{card}', [CardController::class, 'show'])->name('cards.show');
+Route::post('/cards/{card}/refresh-image', [CardController::class, 'refreshImage'])->name('cards.refresh-image');
+
+// Set routes (publicly accessible)
+Route::get('/sets', [SetController::class, 'index'])->name('sets.index');
+Route::get('/sets/{set}', [SetController::class, 'show'])->name('sets.show');
 
 require __DIR__ . '/auth.php';
